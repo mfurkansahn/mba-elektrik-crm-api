@@ -115,9 +115,11 @@ namespace MbaCrm.Api.Controllers
                 return NotFound("Hatırlatma bulunamadı.");
             }
 
-            reminder.IsCompleted = dto.IsCompleted;
+            var isCompleted = dto.IsCompleted.Value;
 
-            if (dto.IsCompleted)
+            reminder.IsCompleted = isCompleted;
+
+            if (isCompleted)
             {
                 reminder.CompletedDate = DateTime.UtcNow;
             }

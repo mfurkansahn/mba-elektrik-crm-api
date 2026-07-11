@@ -1,27 +1,37 @@
-﻿namespace MbaCrm.Api.Entities
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace MbaCrm.Api.Entities
 {
     public class Customer
     {
-        public int Id { get; set; } //Her müşterinin benzersiz numarasıdır.
+        public int Id { get; set; }
 
-        public string FullNameOrCompanyName { get; set; } = string.Empty; //Müşteri adı veya firma adını tutar.
+        [MaxLength(200)]
+        public string FullNameOrCompanyName { get; set; } = string.Empty;
 
-        public string Phone { get; set; } = string.Empty; //Müşterinin telefon numarasını tutar.
+        [MaxLength(20)]
+        public string Phone { get; set; } = string.Empty;
 
-        public string? Email { get; set; } //E-posta bilgisini tutar. (Boş olabilir.)
+        [MaxLength(200)]
+        public string? Email { get; set; }
 
-        public string? Address { get; set; } //Adres bilgisini tutar. (Boş olabilir.)
+        [MaxLength(500)]
+        public string? Address { get; set; }
 
-        public string City { get; set; } = "Ankara"; //Şehir bilgisini tutar. (Varsayılan 'Ankara')
+        [MaxLength(100)]
+        public string City { get; set; } = "Ankara";
 
-        public string? District { get; set; } //İlçe bilgisini tutar.
+        [MaxLength(100)]
+        public string? District { get; set; }
 
-        public string CustomerType { get; set; } = string.Empty; //Müşteri tipini tutar.
+        [MaxLength(20)]
+        public string CustomerType { get; set; } = string.Empty;
 
-        public string? Description { get; set; } //Müşteri hakkında ek açıklama alanıdır.
+        [MaxLength(1000)]
+        public string? Description { get; set; }
 
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow; //Müşterinin sisteme eklendiği tarihi tutar.
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
-        public List<ServiceRequest> ServiceRequests { get; set; } = new(); //Bu müşteriye ait hizmet taleplerini tutar.
+        public List<ServiceRequest> ServiceRequests { get; set; } = new();
     }
 }

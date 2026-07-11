@@ -1,34 +1,39 @@
-﻿using System.Runtime.ConstrainedExecution;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace MbaCrm.Api.Entities
 {
     public class ServiceRequest
     {
-        public int Id { get; set; } //Her hizmet talebinin benzersiz numarasıdır.
+        public int Id { get; set; }
 
-        public int CustomerId { get; set; } //Bu hizmet talebinin hangi müşteriye ait olduğunu gösterir.
+        public int CustomerId { get; set; }
 
-        public Customer Customer { get; set; } = null!; //Bu hizmet talebinin bağlı olduğu müşteri bilgisidir. - Yani CustomerId sayısal bağlantıdır, Customer ise nesne bağlantısıdır.
+        public Customer Customer { get; set; } = null!;
 
-        public string ServiceType { get; set; } = string.Empty; //Hizmet türünü tutar.
+        [MaxLength(150)]
+        public string ServiceType { get; set; } = string.Empty;
 
-        public string Status { get; set; } = "Yeni Talep"; //Başvurunun mevcut durumunu tutar. (Varsayılan 'Yeni Talep')
+        [MaxLength(100)]
+        public string Status { get; set; } = "Yeni Talep";
 
-        public string Title { get; set; } = string.Empty; //Hizmet talebinin kısa başlığıdır.
+        [MaxLength(200)]
+        public string Title { get; set; } = string.Empty;
 
-        public string? Description { get; set; } //Hizmet talebiyle ilgili detay açıklamasıdır.
+        [MaxLength(2000)]
+        public string? Description { get; set; }
 
-        public DateTime StartDate { get; set; } = DateTime.UtcNow; //Hizmet sürecinin başlangıç tarihidir.
+        public DateTime StartDate { get; set; } = DateTime.UtcNow;
 
-        public DateTime? DueDate { get; set; } //İşin hedef / son takip tarihidir.
+        public DateTime? DueDate { get; set; }
 
-        public DateTime? CompletedDate { get; set; } //İşin tamamlandığı tarihtir.
+        public DateTime? CompletedDate { get; set; }
 
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow; //Bu hizmet talebinin sisteme eklendiği tarihtir.
-        
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+
         public List<ServiceRequestNote> Notes { get; set; } = new();
 
         public List<ServiceRequestDocument> Documents { get; set; } = new();
+
         public List<ServiceRequestReminder> Reminders { get; set; } = new();
     }
 }

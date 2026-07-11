@@ -1,7 +1,10 @@
-﻿namespace MbaCrm.Api.DTOs
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace MbaCrm.Api.DTOs
 {
     public class UpdateServiceRequestDocumentDeliveryDto
     {
-        public bool IsDelivered { get; set; }
+        [Required(ErrorMessage = "Evrak teslim durumu zorunludur.")]
+        public bool? IsDelivered { get; set; }
     }
 }

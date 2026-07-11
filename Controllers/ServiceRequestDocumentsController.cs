@@ -94,9 +94,9 @@ namespace MbaCrm.Api.Controllers
 
         [HttpPatch("{documentId:int}/delivery")]
         public async Task<IActionResult> UpdateDeliveryStatus(
-    int serviceRequestId,
-    int documentId,
-    UpdateServiceRequestDocumentDeliveryDto dto)
+            int serviceRequestId,
+            int documentId,
+            UpdateServiceRequestDocumentDeliveryDto dto)
         {
             var document = await _context.ServiceRequestDocuments
                 .FirstOrDefaultAsync(x =>
@@ -108,9 +108,9 @@ namespace MbaCrm.Api.Controllers
                 return NotFound("Evrak bulunamadı.");
             }
 
-            document.IsDelivered = dto.IsDelivered;
+            document.IsDelivered = dto.IsDelivered.Value;
 
-            if (dto.IsDelivered)
+            if (dto.IsDelivered.Value)
             {
                 document.DeliveredDate = DateTime.UtcNow;
             }

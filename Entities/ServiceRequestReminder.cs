@@ -1,4 +1,6 @@
-﻿namespace MbaCrm.Api.Entities
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace MbaCrm.Api.Entities
 {
     public class ServiceRequestReminder
     {
@@ -8,6 +10,7 @@
 
         public ServiceRequest ServiceRequest { get; set; } = null!;
 
+        [MaxLength(1000)]
         public string ReminderText { get; set; } = string.Empty;
 
         public DateTime ReminderDate { get; set; }
