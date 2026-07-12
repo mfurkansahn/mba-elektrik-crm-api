@@ -27,6 +27,42 @@ namespace MbaCrm.Api.Controllers
             _userManager = userManager;
         }
 
+        [HttpGet]
+        public async Task<IActionResult> GetAll()
+        {
+            var customerAccounts =
+                await _context.Users
+                    .AsNoTracking()
+                    .Where(user =>
+                        user.CustomerId.HasValue
+                    )
+                    .OrderBy(user =>
+                        user.FullName
+                    )
+                    .Select(user =>
+                        new CustomerAccountListDto
+                        {
+                            UserId = user.Id,
+                            CustomerId =
+                                user.CustomerId!.Value,
+                            CustomerName =
+                                user.Customer != null
+                                    ? user.Customer
+                                        .FullNameOrCompanyName
+                                    : string.Empty,
+                            FullName =
+                                user.FullName,
+                            Email =
+                                user.Email ?? string.Empty,
+                            CreatedAt =
+                                user.CreatedAt
+                        }
+                    )
+                    .ToListAsync();
+
+            return Ok(customerAccounts);
+        }
+
         [HttpPost]
         public async Task<IActionResult> Create(
     CreateCustomerAccountDto dto)
