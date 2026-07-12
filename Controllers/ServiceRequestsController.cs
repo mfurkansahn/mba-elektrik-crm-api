@@ -1,18 +1,17 @@
-﻿using MbaCrm.Api.Data;
+﻿using MbaCrm.Api.Constants;
+using MbaCrm.Api.Data;
 using MbaCrm.Api.DTOs;
 using MbaCrm.Api.Entities;
-
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-
-using Microsoft.AspNetCore.Authorization;
 
 namespace MbaCrm.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
+    [Authorize(Roles = AppRoles.Admin + "," + AppRoles.User)]
     public class ServiceRequestsController : ControllerBase
     {
         private readonly AppDbContext _context; //Veritabanına ulaşmak için kullanacağımız alan.
@@ -371,6 +370,7 @@ namespace MbaCrm.Api.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize(Roles = AppRoles.Admin)]
         public async Task<IActionResult> DeleteServiceRequest(int id)
         {
             var serviceRequest = await _context.ServiceRequests.FindAsync(id);

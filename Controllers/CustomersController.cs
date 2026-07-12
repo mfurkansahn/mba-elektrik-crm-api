@@ -13,7 +13,7 @@ namespace MbaCrm.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
+    [Authorize(Roles = AppRoles.Admin + "," + AppRoles.User)]
     public class CustomersController : ControllerBase
     {
         private readonly AppDbContext _context; //Controller’ın veritabanına ulaşmasını sağlar.

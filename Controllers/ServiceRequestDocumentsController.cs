@@ -1,18 +1,17 @@
-﻿using MbaCrm.Api.Data;
+﻿using MbaCrm.Api.Constants;
+using MbaCrm.Api.Data;
 using MbaCrm.Api.DTOs;
 using MbaCrm.Api.Entities;
-
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-
-using Microsoft.AspNetCore.Authorization;
 
 namespace MbaCrm.Api.Controllers
 {
     [Route("api/ServiceRequests/{serviceRequestId}/documents")]
     [ApiController]
-    [Authorize]
+    [Authorize(Roles = AppRoles.Admin + "," + AppRoles.User)]
     public class ServiceRequestDocumentsController : ControllerBase
     {
         private readonly AppDbContext _context;
@@ -139,6 +138,7 @@ namespace MbaCrm.Api.Controllers
         }
 
         [HttpDelete("{documentId:int}")]
+        [Authorize(Roles = AppRoles.Admin)]
         public async Task<IActionResult> DeleteDocument(int serviceRequestId, int documentId)
         {
             var document = await _context.ServiceRequestDocuments

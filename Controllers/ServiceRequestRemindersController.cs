@@ -1,6 +1,7 @@
 ﻿using MbaCrm.Api.Data;
 using MbaCrm.Api.DTOs;
 using MbaCrm.Api.Entities;
+using MbaCrm.Api.Constants;
 
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -12,7 +13,7 @@ namespace MbaCrm.Api.Controllers
 {
     [Route("api/ServiceRequests/{serviceRequestId:int}/reminders")]
     [ApiController]
-    [Authorize]
+    [Authorize(Roles = AppRoles.Admin + "," + AppRoles.User)]
     public class ServiceRequestRemindersController : ControllerBase
     {
         private readonly AppDbContext _context;
@@ -148,6 +149,7 @@ namespace MbaCrm.Api.Controllers
         }
 
         [HttpDelete("{reminderId:int}")]
+        [Authorize(Roles = AppRoles.Admin)]
         public async Task<IActionResult> DeleteReminder(
     int serviceRequestId,
     int reminderId)

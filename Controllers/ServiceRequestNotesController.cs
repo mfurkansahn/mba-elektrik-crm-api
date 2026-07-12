@@ -2,6 +2,8 @@
 using MbaCrm.Api.DTOs;
 using MbaCrm.Api.Entities;
 
+using MbaCrm.Api.Constants;
+
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -12,7 +14,7 @@ namespace MbaCrm.Api.Controllers
 {
     [Route("api/ServiceRequests/{serviceRequestId}/notes")]
     [ApiController]
-    [Authorize]
+    [Authorize(Roles = AppRoles.Admin + "," + AppRoles.User)]
     public class ServiceRequestNotesController : ControllerBase
     {
         private readonly AppDbContext _context;
@@ -85,6 +87,7 @@ namespace MbaCrm.Api.Controllers
         }
 
         [HttpDelete("{noteId}")]
+        [Authorize(Roles = AppRoles.Admin)]
         public async Task<IActionResult> DeleteNote(int serviceRequestId, int noteId)
         {
             var note = await _context.ServiceRequestNotes

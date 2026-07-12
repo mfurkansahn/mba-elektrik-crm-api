@@ -1,16 +1,15 @@
-﻿using MbaCrm.Api.Data;
-
+﻿using MbaCrm.Api.Constants;
+using MbaCrm.Api.Data;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-
-using Microsoft.AspNetCore.Authorization;
 
 namespace MbaCrm.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
+    [Authorize(Roles = AppRoles.Admin + "," + AppRoles.User)]
 
     public class DashboardController : ControllerBase
     {
