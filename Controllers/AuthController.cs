@@ -7,6 +7,8 @@ using MbaCrm.Api.Entities;
 using MbaCrm.Api.DTOs;
 using MbaCrm.Api.Constants;
 
+using Microsoft.AspNetCore.Authorization;
+
 namespace MbaCrm.Api.Controllers
 {
     [Route("api/[controller]")]
@@ -28,6 +30,7 @@ namespace MbaCrm.Api.Controllers
         }
 
         [HttpPost("register")]
+        [Authorize(Roles = AppRoles.Admin)]
         public async Task<IActionResult> Register(RegisterDto registerDto)
         {
             var email = registerDto.Email.Trim();
@@ -90,6 +93,7 @@ namespace MbaCrm.Api.Controllers
         }
 
         [HttpPost("login")]
+        [AllowAnonymous]
         public async Task<IActionResult> Login(LoginDto loginDto)
         {
             var email = loginDto.Email.Trim();

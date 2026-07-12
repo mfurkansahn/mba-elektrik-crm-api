@@ -8,6 +8,10 @@ namespace MbaCrm.Api.Entities
         [MaxLength(150)]
         public string FullName { get; set; } = string.Empty;
 
+        public int? CustomerId { get; set; }
+
+        public Customer? Customer { get; set; }
+
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     }
 }

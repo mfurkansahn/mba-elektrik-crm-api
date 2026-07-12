@@ -12,7 +12,8 @@ namespace MbaCrm.Api.Data
             string[] roleNames =
             {
                 AppRoles.Admin,
-                AppRoles.User
+                AppRoles.User,
+                AppRoles.Customer
             };
 
             foreach (var roleName in roleNames)

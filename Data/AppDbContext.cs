@@ -20,5 +20,19 @@ namespace MbaCrm.Api.Data
         public DbSet<ServiceRequestDocument> ServiceRequestDocuments { get; set; }
 
         public DbSet<ServiceRequestReminder> ServiceRequestReminders { get; set; }
+
+        protected override void OnModelCreating(
+    ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<ApplicationUser>()
+                .HasOne(user => user.Customer)
+                .WithOne()
+                .HasForeignKey<ApplicationUser>(
+                    user => user.CustomerId
+                )
+                .OnDelete(DeleteBehavior.Restrict);
+        }
     }
 }
