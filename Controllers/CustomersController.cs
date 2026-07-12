@@ -6,10 +6,14 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
+using Microsoft.AspNetCore.Authorization;
+using MbaCrm.Api.Constants;
+
 namespace MbaCrm.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class CustomersController : ControllerBase
     {
         private readonly AppDbContext _context; //Controller’ın veritabanına ulaşmasını sağlar.
@@ -250,6 +254,7 @@ namespace MbaCrm.Api.Controllers
             return NoContent(); //Başarılı güncellemede 204 No Content döner.
         }
 
+        [Authorize(Roles = AppRoles.Admin)]
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {

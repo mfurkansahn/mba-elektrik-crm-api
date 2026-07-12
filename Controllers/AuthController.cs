@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 
 using MbaCrm.Api.Entities;
 using MbaCrm.Api.DTOs;
+using MbaCrm.Api.Constants;
 
 namespace MbaCrm.Api.Controllers
 {
@@ -59,6 +60,21 @@ namespace MbaCrm.Api.Controllers
                     .Select(error => error.Description);
 
                 return BadRequest(errors);
+            }
+
+            var roleResult = await _userManager.AddToRoleAsync(
+                user,
+                AppRoles.User
+            );
+
+            if (!roleResult.Succeeded)
+            {
+                await _userManager.DeleteAsync(user);
+
+                var roleErrors = roleResult.Errors
+                    .Select(error => error.Description);
+
+                return BadRequest(roleErrors);
             }
 
             return StatusCode(

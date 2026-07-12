@@ -6,10 +6,13 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
+using Microsoft.AspNetCore.Authorization;
+
 namespace MbaCrm.Api.Controllers
 {
     [Route("api/ServiceRequests/{serviceRequestId}/notes")]
     [ApiController]
+    [Authorize]
     public class ServiceRequestNotesController : ControllerBase
     {
         private readonly AppDbContext _context;

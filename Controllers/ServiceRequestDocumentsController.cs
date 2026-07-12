@@ -6,10 +6,13 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
+using Microsoft.AspNetCore.Authorization;
+
 namespace MbaCrm.Api.Controllers
 {
     [Route("api/ServiceRequests/{serviceRequestId}/documents")]
     [ApiController]
+    [Authorize]
     public class ServiceRequestDocumentsController : ControllerBase
     {
         private readonly AppDbContext _context;
