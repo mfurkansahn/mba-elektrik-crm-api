@@ -1,3 +1,5 @@
+using MbaCrm.Api.Middleware;
+
 using System.Text;
 
 using MbaCrm.Api.Data;
@@ -122,6 +124,8 @@ builder.Services.AddSwaggerGen(options =>
 });
 
 var app = builder.Build();
+
+app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 using (var scope = app.Services.CreateScope())
 {
