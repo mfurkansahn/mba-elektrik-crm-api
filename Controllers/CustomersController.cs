@@ -38,25 +38,54 @@ namespace MbaCrm.Api.Controllers
         {
             if (pageNumber < 1)
             {
-                return BadRequest(
-                    "Sayfa numarası en az 1 olmalıdır."
-                );
+                var problemDetails = new ProblemDetails
+                {
+                    Status = StatusCodes.Status400BadRequest,
+                    Title = "Geçersiz sorgu parametresi.",
+                    Detail = "Sayfa numarası en az 1 olmalıdır.",
+                    Instance = HttpContext.Request.Path
+                };
+
+                problemDetails.Extensions["traceId"] =
+                    HttpContext.TraceIdentifier;
+
+                return BadRequest(problemDetails);
             }
 
             if (pageSize < 1 || pageSize > 100)
             {
-                return BadRequest(
-                    "Sayfa boyutu 1 ile 100 arasında olmalıdır."
-                );
+                var problemDetails = new ProblemDetails
+                {
+                    Status = StatusCodes.Status400BadRequest,
+                    Title = "Geçersiz sorgu parametresi.",
+                    Detail =
+                        "Sayfa boyutu 1 ile 100 arasında olmalıdır.",
+                    Instance = HttpContext.Request.Path
+                };
+
+                problemDetails.Extensions["traceId"] =
+                    HttpContext.TraceIdentifier;
+
+                return BadRequest(problemDetails);
             }
 
             if (createdFrom.HasValue &&
-                createdTo.HasValue &&
-                createdFrom.Value.Date > createdTo.Value.Date)
+    createdTo.HasValue &&
+    createdFrom.Value.Date > createdTo.Value.Date)
             {
-                return BadRequest(
-                    "Başlangıç tarihi, bitiş tarihinden büyük olamaz."
-                );
+                var problemDetails = new ProblemDetails
+                {
+                    Status = StatusCodes.Status400BadRequest,
+                    Title = "Geçersiz tarih aralığı.",
+                    Detail =
+                        "Başlangıç tarihi, bitiş tarihinden büyük olamaz.",
+                    Instance = HttpContext.Request.Path
+                };
+
+                problemDetails.Extensions["traceId"] =
+                    HttpContext.TraceIdentifier;
+
+                return BadRequest(problemDetails);
             }
 
             var query = _context.Customers
@@ -132,11 +161,21 @@ namespace MbaCrm.Api.Controllers
                 .ToLowerInvariant();
 
             if (sortDirection != "asc" &&
-                sortDirection != "desc")
+    sortDirection != "desc")
             {
-                return BadRequest(
-                    "Sıralama yönü 'asc' veya 'desc' olmalıdır."
-                );
+                var problemDetails = new ProblemDetails
+                {
+                    Status = StatusCodes.Status400BadRequest,
+                    Title = "Geçersiz sorgu parametresi.",
+                    Detail =
+                        "Sıralama yönü 'asc' veya 'desc' olmalıdır.",
+                    Instance = HttpContext.Request.Path
+                };
+
+                problemDetails.Extensions["traceId"] =
+                    HttpContext.TraceIdentifier;
+
+                return BadRequest(problemDetails);
             }
 
             query = sortBy switch
@@ -202,7 +241,18 @@ namespace MbaCrm.Api.Controllers
 
             if (customer is null)
             {
-                return NotFound("Müşteri bulunamadı."); //Müşteri yoksa 404 döner.
+                var problemDetails = new ProblemDetails
+                {
+                    Status = StatusCodes.Status404NotFound,
+                    Title = "Kayıt bulunamadı.",
+                    Detail = "Belirtilen müşteri bulunamadı.",
+                    Instance = HttpContext.Request.Path
+                };
+
+                problemDetails.Extensions["traceId"] =
+                    HttpContext.TraceIdentifier;
+
+                return NotFound(problemDetails);
             }
 
             return Ok(customer);
@@ -237,7 +287,18 @@ namespace MbaCrm.Api.Controllers
 
             if (customer is null)
             {
-                return NotFound("Müşteri bulunamadı."); //Müşteri yoksa 404 Not Found döner.
+                var problemDetails = new ProblemDetails
+                {
+                    Status = StatusCodes.Status404NotFound,
+                    Title = "Kayıt bulunamadı.",
+                    Detail = "Güncellenmek istenen müşteri bulunamadı.",
+                    Instance = HttpContext.Request.Path
+                };
+
+                problemDetails.Extensions["traceId"] =
+                    HttpContext.TraceIdentifier;
+
+                return NotFound(problemDetails);
             }
 
             customer.FullNameOrCompanyName = dto.FullNameOrCompanyName; //DTO’dan gelen yeni değerleri mevcut müşteri nesnesine aktarıyoruz.
@@ -262,7 +323,18 @@ namespace MbaCrm.Api.Controllers
 
             if (customer is null)
             {
-                return NotFound("Müşteri bulunamadı."); //Müşteri yoksa 404 Not Found döner.
+                var problemDetails = new ProblemDetails
+                {
+                    Status = StatusCodes.Status404NotFound,
+                    Title = "Kayıt bulunamadı.",
+                    Detail = "Silinmek istenen müşteri bulunamadı.",
+                    Instance = HttpContext.Request.Path
+                };
+
+                problemDetails.Extensions["traceId"] =
+                    HttpContext.TraceIdentifier;
+
+                return NotFound(problemDetails);
             }
 
             _context.Customers.Remove(customer); //Bu müşteri silinmek üzere işaretlenir.
@@ -279,7 +351,19 @@ namespace MbaCrm.Api.Controllers
 
             if (!customerExists)
             {
-                return NotFound("Müşteri bulunamadı.");
+                var problemDetails = new ProblemDetails
+                {
+                    Status = StatusCodes.Status404NotFound,
+                    Title = "Kayıt bulunamadı.",
+                    Detail =
+                        "Hizmet talepleri görüntülenmek istenen müşteri bulunamadı.",
+                    Instance = HttpContext.Request.Path
+                };
+
+                problemDetails.Extensions["traceId"] =
+                    HttpContext.TraceIdentifier;
+
+                return NotFound(problemDetails);
             }
 
             var serviceRequests = await _context.ServiceRequests
