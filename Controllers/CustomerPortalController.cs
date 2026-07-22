@@ -8,12 +8,14 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
+using Microsoft.AspNetCore.Http;
+
 namespace MbaCrm.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
     [Authorize(Roles = AppRoles.Customer)]
-    public class CustomerPortalController : ControllerBase
+    public class CustomerPortalController : ApiControllerBase
     {
         private readonly AppDbContext _context;
 
@@ -75,7 +77,9 @@ namespace MbaCrm.Api.Controllers
 
             if (profile is null)
             {
-                return NotFound(
+                return ApiProblem(
+                    StatusCodes.Status404NotFound,
+                    "Kayıt bulunamadı.",
                     "Bağlı müşteri kaydı bulunamadı."
                 );
             }
@@ -190,7 +194,9 @@ namespace MbaCrm.Api.Controllers
 
             if (serviceRequest is null)
             {
-                return NotFound(
+                return ApiProblem(
+                    StatusCodes.Status404NotFound,
+                    "Kayıt bulunamadı.",
                     "Hizmet talebi bulunamadı."
                 );
             }

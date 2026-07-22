@@ -12,7 +12,7 @@ namespace MbaCrm.Api.Controllers
     [Route("api/ServiceRequests/{serviceRequestId}/documents")]
     [ApiController]
     [Authorize(Roles = AppRoles.Admin + "," + AppRoles.User)]
-    public class ServiceRequestDocumentsController : ControllerBase
+    public class ServiceRequestDocumentsController : ApiControllerBase
     {
         private readonly AppDbContext _context;
 
@@ -29,12 +29,20 @@ namespace MbaCrm.Api.Controllers
 
             if (!serviceRequestExists)
             {
-                return NotFound("Hizmet talebi bulunamadı.");
+                return ApiProblem(
+                    StatusCodes.Status404NotFound,
+                    "Kayıt bulunamadı.",
+                    "Evrak eklenmek istenen hizmet talebi bulunamadı."
+                );
             }
 
             if (string.IsNullOrWhiteSpace(dto.DocumentName))
             {
-                return BadRequest("Evrak adı boş olamaz.");
+                return ApiProblem(
+                    StatusCodes.Status400BadRequest,
+                    "Geçersiz istek.",
+                    "Evrak adı boş olamaz."
+                );
             }
 
             var document = new ServiceRequestDocument
@@ -73,7 +81,11 @@ namespace MbaCrm.Api.Controllers
 
             if (!serviceRequestExists)
             {
-                return NotFound("Hizmet talebi bulunamadı.");
+                return ApiProblem(
+                    StatusCodes.Status404NotFound,
+                    "Kayıt bulunamadı.",
+                    "Evrakları görüntülenmek istenen hizmet talebi bulunamadı."
+                );
             }
 
             var documents = await _context.ServiceRequestDocuments
@@ -105,9 +117,13 @@ namespace MbaCrm.Api.Controllers
                     x.Id == documentId &&
                     x.ServiceRequestId == serviceRequestId);
 
-            if (document == null)
+            if (document is null)
             {
-                return NotFound("Evrak bulunamadı.");
+                return ApiProblem(
+                    StatusCodes.Status404NotFound,
+                    "Kayıt bulunamadı.",
+                    "Teslim durumu güncellenmek istenen evrak bulunamadı."
+                );
             }
 
             document.IsDelivered = dto.IsDelivered.Value;
@@ -146,9 +162,13 @@ namespace MbaCrm.Api.Controllers
                     x.Id == documentId &&
                     x.ServiceRequestId == serviceRequestId);
 
-            if (document == null)
+            if (document is null)
             {
-                return NotFound("Evrak bulunamadı.");
+                return ApiProblem(
+                    StatusCodes.Status404NotFound,
+                    "Kayıt bulunamadı.",
+                    "Silinmek istenen evrak bulunamadı."
+                );
             }
 
             _context.ServiceRequestDocuments.Remove(document);

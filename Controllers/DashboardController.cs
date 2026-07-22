@@ -11,7 +11,7 @@ namespace MbaCrm.Api.Controllers
     [ApiController]
     [Authorize(Roles = AppRoles.Admin + "," + AppRoles.User)]
 
-    public class DashboardController : ControllerBase
+    public class DashboardController : ApiControllerBase
     {
         private readonly AppDbContext _context;
 

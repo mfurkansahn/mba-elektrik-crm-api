@@ -14,7 +14,7 @@ namespace MbaCrm.Api.Controllers
     [Route("api/ServiceRequests/{serviceRequestId:int}/reminders")]
     [ApiController]
     [Authorize(Roles = AppRoles.Admin + "," + AppRoles.User)]
-    public class ServiceRequestRemindersController : ControllerBase
+    public class ServiceRequestRemindersController : ApiControllerBase
     {
         private readonly AppDbContext _context;
 
@@ -33,17 +33,29 @@ namespace MbaCrm.Api.Controllers
 
             if (!serviceRequestExists)
             {
-                return NotFound("Hizmet talebi bulunamadı.");
+                return ApiProblem(
+                    StatusCodes.Status404NotFound,
+                    "Kayıt bulunamadı.",
+                    "Hatırlatma eklenmek istenen hizmet talebi bulunamadı."
+                );
             }
 
             if (string.IsNullOrWhiteSpace(dto.ReminderText))
             {
-                return BadRequest("Hatırlatma metni boş olamaz.");
+                return ApiProblem(
+                    StatusCodes.Status400BadRequest,
+                    "Geçersiz istek.",
+                    "Hatırlatma metni boş olamaz."
+                );
             }
 
             if (dto.ReminderDate <= DateTime.UtcNow)
             {
-                return BadRequest("Hatırlatma tarihi gelecekte olmalıdır.");
+                return ApiProblem(
+                    StatusCodes.Status400BadRequest,
+                    "Geçersiz tarih bilgisi.",
+                    "Hatırlatma tarihi gelecekte olmalıdır."
+                );
             }
 
             var reminder = new ServiceRequestReminder
@@ -82,7 +94,11 @@ namespace MbaCrm.Api.Controllers
 
             if (!serviceRequestExists)
             {
-                return NotFound("Hizmet talebi bulunamadı.");
+                return ApiProblem(
+                    StatusCodes.Status404NotFound,
+                    "Kayıt bulunamadı.",
+                    "Hatırlatmaları görüntülenmek istenen hizmet talebi bulunamadı."
+                );
             }
 
             var reminders = await _context.ServiceRequestReminders
@@ -114,9 +130,13 @@ namespace MbaCrm.Api.Controllers
                     x.Id == reminderId &&
                     x.ServiceRequestId == serviceRequestId);
 
-            if (reminder == null)
+            if (reminder is null)
             {
-                return NotFound("Hatırlatma bulunamadı.");
+                return ApiProblem(
+                    StatusCodes.Status404NotFound,
+                    "Kayıt bulunamadı.",
+                    "Tamamlanma durumu güncellenmek istenen hatırlatma bulunamadı."
+                );
             }
 
             var isCompleted = dto.IsCompleted.Value;
@@ -159,9 +179,13 @@ namespace MbaCrm.Api.Controllers
                     x.Id == reminderId &&
                     x.ServiceRequestId == serviceRequestId);
 
-            if (reminder == null)
+            if (reminder is null)
             {
-                return NotFound("Hatırlatma bulunamadı.");
+                return ApiProblem(
+                    StatusCodes.Status404NotFound,
+                    "Kayıt bulunamadı.",
+                    "Silinmek istenen hatırlatma bulunamadı."
+                );
             }
 
             _context.ServiceRequestReminders.Remove(reminder);

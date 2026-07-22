@@ -15,7 +15,7 @@ namespace MbaCrm.Api.Controllers
     [Route("api/ServiceRequests/{serviceRequestId}/notes")]
     [ApiController]
     [Authorize(Roles = AppRoles.Admin + "," + AppRoles.User)]
-    public class ServiceRequestNotesController : ControllerBase
+    public class ServiceRequestNotesController : ApiControllerBase
     {
         private readonly AppDbContext _context;
 
@@ -34,12 +34,20 @@ namespace MbaCrm.Api.Controllers
 
             if (!serviceRequestExists)
             {
-                return NotFound("Hizmet talebi bulunamadı.");
+                return ApiProblem(
+                    StatusCodes.Status404NotFound,
+                    "Kayıt bulunamadı.",
+                    "Not eklenmek istenen hizmet talebi bulunamadı."
+                );
             }
 
             if (string.IsNullOrWhiteSpace(dto.NoteText))
             {
-                return BadRequest("Not metni boş olamaz.");
+                return ApiProblem(
+                    StatusCodes.Status400BadRequest,
+                    "Geçersiz istek.",
+                    "Not metni boş olamaz."
+                );
             }
 
             var note = new ServiceRequestNote
@@ -68,7 +76,11 @@ namespace MbaCrm.Api.Controllers
 
             if (!serviceRequestExists)
             {
-                return NotFound("Hizmet talebi bulunamadı.");
+                return ApiProblem(
+                    StatusCodes.Status404NotFound,
+                    "Kayıt bulunamadı.",
+                    "Notları görüntülenmek istenen hizmet talebi bulunamadı."
+                );
             }
 
             var notes = await _context.ServiceRequestNotes
@@ -95,9 +107,13 @@ namespace MbaCrm.Api.Controllers
                     n.Id == noteId &&
                     n.ServiceRequestId == serviceRequestId);
 
-            if (note == null)
+            if (note is null)
             {
-                return NotFound("Not bulunamadı.");
+                return ApiProblem(
+                    StatusCodes.Status404NotFound,
+                    "Kayıt bulunamadı.",
+                    "Silinmek istenen not bulunamadı."
+                );
             }
 
             _context.ServiceRequestNotes.Remove(note);

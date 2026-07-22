@@ -8,12 +8,14 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
+using Microsoft.AspNetCore.Http;
+
 namespace MbaCrm.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
     [Authorize(Roles = AppRoles.Admin)]
-    public class CustomerAccountsController : ControllerBase
+    public class CustomerAccountsController : ApiControllerBase
     {
         private readonly AppDbContext _context;
 
@@ -74,7 +76,9 @@ namespace MbaCrm.Api.Controllers
 
             if (!customerExists)
             {
-                return NotFound(
+                return ApiProblem(
+                    StatusCodes.Status404NotFound,
+                    "Kayıt bulunamadı.",
                     "Belirtilen müşteri kaydı bulunamadı."
                 );
             }
@@ -86,7 +90,9 @@ namespace MbaCrm.Api.Controllers
 
             if (accountAlreadyExists)
             {
-                return Conflict(
+                return ApiProblem(
+                    StatusCodes.Status409Conflict,
+                    "Kayıt çakışması.",
                     "Bu müşteriye ait bir portal hesabı zaten bulunmaktadır."
                 );
             }
@@ -98,7 +104,9 @@ namespace MbaCrm.Api.Controllers
 
             if (existingUser is not null)
             {
-                return Conflict(
+                return ApiProblem(
+                    StatusCodes.Status409Conflict,
+                    "Kayıt çakışması.",
                     "Bu e-posta adresi başka bir kullanıcı tarafından kullanılmaktadır."
                 );
             }
@@ -118,12 +126,19 @@ namespace MbaCrm.Api.Controllers
 
             if (!createResult.Succeeded)
             {
-                return BadRequest(
-                    createResult.Errors.Select(error => new
+                var errors = createResult.Errors
+                    .Select(error => new
                     {
                         error.Code,
                         error.Description
                     })
+                    .ToList();
+
+                return ApiProblem(
+                    StatusCodes.Status400BadRequest,
+                    "Kullanıcı oluşturulamadı.",
+                    "Portal hesabı oluşturulurken doğrulama hataları oluştu.",
+                    errors
                 );
             }
 
@@ -136,12 +151,19 @@ namespace MbaCrm.Api.Controllers
             {
                 await _userManager.DeleteAsync(user);
 
-                return BadRequest(
-                    roleResult.Errors.Select(error => new
+                var errors = roleResult.Errors
+                    .Select(error => new
                     {
                         error.Code,
                         error.Description
                     })
+                    .ToList();
+
+                return ApiProblem(
+                    StatusCodes.Status400BadRequest,
+                    "Rol atanamadı.",
+                    "Portal hesabına müşteri rolü atanırken hatalar oluştu.",
+                    errors
                 );
             }
 

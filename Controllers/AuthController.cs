@@ -13,7 +13,7 @@ namespace MbaCrm.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class AuthController : ControllerBase
+    public class AuthController : ApiControllerBase
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
@@ -40,7 +40,9 @@ namespace MbaCrm.Api.Controllers
 
             if (existingUser is not null)
             {
-                return BadRequest(
+                return ApiProblem(
+                    StatusCodes.Status409Conflict,
+                    "Kayıt çakışması.",
                     "Bu e-posta adresi zaten kullanılıyor."
                 );
             }
@@ -60,9 +62,19 @@ namespace MbaCrm.Api.Controllers
             if (!result.Succeeded)
             {
                 var errors = result.Errors
-                    .Select(error => error.Description);
+                    .Select(error => new
+                    {
+                        error.Code,
+                        error.Description
+                    })
+                    .ToList();
 
-                return BadRequest(errors);
+                return ApiProblem(
+                    StatusCodes.Status400BadRequest,
+                    "Kullanıcı oluşturulamadı.",
+                    "Personel hesabı oluşturulurken doğrulama hataları oluştu.",
+                    errors
+                );
             }
 
             var roleResult = await _userManager.AddToRoleAsync(
@@ -74,10 +86,20 @@ namespace MbaCrm.Api.Controllers
             {
                 await _userManager.DeleteAsync(user);
 
-                var roleErrors = roleResult.Errors
-                    .Select(error => error.Description);
+                var errors = roleResult.Errors
+                    .Select(error => new
+                    {
+                        error.Code,
+                        error.Description
+                    })
+                    .ToList();
 
-                return BadRequest(roleErrors);
+                return ApiProblem(
+                    StatusCodes.Status400BadRequest,
+                    "Rol atanamadı.",
+                    "Personel hesabına kullanıcı rolü atanırken hatalar oluştu.",
+                    errors
+                );
             }
 
             return StatusCode(
@@ -102,8 +124,10 @@ namespace MbaCrm.Api.Controllers
 
             if (user is null)
             {
-                return Unauthorized(
-                    "E-posta veya şifre hatalı."
+                return ApiProblem(
+                    StatusCodes.Status401Unauthorized,
+                    "Giriş başarısız.",
+                    "E-posta veya şifre hatalı ya da hesap geçici olarak kullanılamıyor."
                 );
             }
 
@@ -116,15 +140,19 @@ namespace MbaCrm.Api.Controllers
 
             if (signInResult.IsLockedOut)
             {
-                return Unauthorized(
-                    "Çok fazla başarısız giriş yapıldı. Hesap geçici olarak kilitlendi."
+                return ApiProblem(
+                    StatusCodes.Status401Unauthorized,
+                    "Giriş başarısız.",
+                    "E-posta veya şifre hatalı ya da hesap geçici olarak kullanılamıyor."
                 );
             }
 
             if (!signInResult.Succeeded)
             {
-                return Unauthorized(
-                    "E-posta veya şifre hatalı."
+                return ApiProblem(
+                    StatusCodes.Status401Unauthorized,
+                    "Giriş başarısız.",
+                    "E-posta veya şifre hatalı ya da hesap geçici olarak kullanılamıyor."
                 );
             }
 

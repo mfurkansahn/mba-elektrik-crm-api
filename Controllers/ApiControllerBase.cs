@@ -5,9 +5,10 @@ namespace MbaCrm.Api.Controllers
     public abstract class ApiControllerBase : ControllerBase
     {
         protected ObjectResult ApiProblem(
-            int statusCode,
-            string title,
-            string detail)
+    int statusCode,
+    string title,
+    string detail,
+    object? errors = null)
         {
             var problemDetails = new ProblemDetails
             {
@@ -19,6 +20,11 @@ namespace MbaCrm.Api.Controllers
 
             problemDetails.Extensions["traceId"] =
                 HttpContext.TraceIdentifier;
+
+            if (errors is not null)
+            {
+                problemDetails.Extensions["errors"] = errors;
+            }
 
             return StatusCode(statusCode, problemDetails);
         }
