@@ -20,13 +20,16 @@ namespace MbaCrm.Api.Controllers
         private readonly AppDbContext _context;
 
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly ILogger<CustomerAccountsController> _logger;
 
         public CustomerAccountsController(
-            AppDbContext context,
-            UserManager<ApplicationUser> userManager)
+    AppDbContext context,
+    UserManager<ApplicationUser> userManager,
+    ILogger<CustomerAccountsController> logger)
         {
             _context = context;
             _userManager = userManager;
+            _logger = logger;
         }
 
         [HttpGet]
@@ -149,7 +152,33 @@ namespace MbaCrm.Api.Controllers
 
             if (!roleResult.Succeeded)
             {
-                await _userManager.DeleteAsync(user);
+
+                _logger.LogWarning(
+        "Müşteri rolü atanamadı. Oluşturulan hesap geri alınacak. UserId: {UserId}, CustomerId: {CustomerId}, ErrorCodes: {ErrorCodes}, TraceId: {TraceId}",
+        user.Id,
+        user.CustomerId,
+        string.Join(
+            ", ",
+            roleResult.Errors.Select(error => error.Code)
+        ),
+        HttpContext.TraceIdentifier
+    );
+
+                var deleteResult = await _userManager.DeleteAsync(user);
+
+                if (!deleteResult.Succeeded)
+                {
+                    _logger.LogError(
+                        "Rol ataması başarısız olduktan sonra kullanıcı hesabı geri alınamadı. UserId: {UserId}, CustomerId: {CustomerId}, ErrorCodes: {ErrorCodes}, TraceId: {TraceId}",
+                        user.Id,
+                        user.CustomerId,
+                        string.Join(
+                            ", ",
+                            deleteResult.Errors.Select(error => error.Code)
+                        ),
+                        HttpContext.TraceIdentifier
+                    );
+                }
 
                 var errors = roleResult.Errors
                     .Select(error => new
@@ -166,6 +195,13 @@ namespace MbaCrm.Api.Controllers
                     errors
                 );
             }
+
+            _logger.LogInformation(
+    "Müşteri portal hesabı oluşturuldu. UserId: {UserId}, CustomerId: {CustomerId}, TraceId: {TraceId}",
+    user.Id,
+    user.CustomerId,
+    HttpContext.TraceIdentifier
+);
 
             return Created(
                 $"/api/CustomerAccounts/{user.Id}",

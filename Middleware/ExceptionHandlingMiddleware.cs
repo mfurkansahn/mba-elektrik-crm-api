@@ -37,9 +37,12 @@ namespace MbaCrm.Api.Middleware
     Exception exception)
         {
             _logger.LogError(
-                exception,
-                "Beklenmeyen bir sunucu hatası oluştu."
-            );
+    exception,
+    "Beklenmeyen sunucu hatası. Method: {Method}, Path: {Path}, TraceId: {TraceId}",
+    context.Request.Method,
+    context.Request.Path,
+    context.TraceIdentifier
+);
 
             var problemDetails = new ProblemDetails
             {
