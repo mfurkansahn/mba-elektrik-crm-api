@@ -12,7 +12,7 @@ namespace MbaCrm.Api.Controllers
     [Route("api/[controller]")]
     [ApiController]
     [Authorize(Roles = AppRoles.Admin + "," + AppRoles.User)]
-    public class ServiceRequestsController : ControllerBase
+    public class ServiceRequestsController : ApiControllerBase
     {
         private readonly AppDbContext _context; //Veritabanına ulaşmak için kullanacağımız alan.
 
@@ -47,12 +47,18 @@ namespace MbaCrm.Api.Controllers
         {
             if (pageNumber < 1)
             {
-                return BadRequest("Sayfa numarası en az 1 olmalıdır.");
+                return ApiProblem(
+                    StatusCodes.Status400BadRequest,
+                    "Geçersiz sorgu parametresi.",
+                    "Sayfa numarası en az 1 olmalıdır."
+                );
             }
 
             if (pageSize < 1 || pageSize > 100)
             {
-                return BadRequest(
+                return ApiProblem(
+                    StatusCodes.Status400BadRequest,
+                    "Geçersiz sorgu parametresi.",
                     "Sayfa boyutu 1 ile 100 arasında olmalıdır."
                 );
             }
@@ -61,7 +67,9 @@ namespace MbaCrm.Api.Controllers
     createdTo.HasValue &&
     createdFrom.Value.Date > createdTo.Value.Date)
             {
-                return BadRequest(
+                return ApiProblem(
+                    StatusCodes.Status400BadRequest,
+                    "Geçersiz tarih aralığı.",
                     "Başlangıç tarihi, bitiş tarihinden büyük olamaz."
                 );
             }
@@ -107,9 +115,12 @@ namespace MbaCrm.Api.Controllers
             sortBy = sortBy.Trim().ToLowerInvariant();
             sortDirection = sortDirection.Trim().ToLowerInvariant();
 
-            if (sortDirection != "asc" && sortDirection != "desc")
+            if (sortDirection != "asc" &&
+    sortDirection != "desc")
             {
-                return BadRequest(
+                return ApiProblem(
+                    StatusCodes.Status400BadRequest,
+                    "Geçersiz sorgu parametresi.",
                     "Sıralama yönü 'asc' veya 'desc' olmalıdır."
                 );
             }
@@ -198,9 +209,13 @@ namespace MbaCrm.Api.Controllers
         {
             var customer = await _context.Customers.FindAsync(dto.CustomerId);
 
-            if (customer == null)
+            if (customer is null)
             {
-                return BadRequest("Bu CustomerId ile müşteri bulunamadı.");
+                return ApiProblem(
+                    StatusCodes.Status400BadRequest,
+                    "Geçersiz müşteri bilgisi.",
+                    "Bu CustomerId ile müşteri bulunamadı."
+                );
             }
 
             var serviceRequest = new ServiceRequest
@@ -302,9 +317,13 @@ namespace MbaCrm.Api.Controllers
                 })
                 .FirstOrDefaultAsync();
 
-            if (serviceRequest == null)
+            if (serviceRequest is null)
             {
-                return NotFound("Hizmet talebi bulunamadı.");
+                return ApiProblem(
+                    StatusCodes.Status404NotFound,
+                    "Kayıt bulunamadı.",
+                    "Belirtilen hizmet talebi bulunamadı."
+                );
             }
 
             return Ok(serviceRequest);
@@ -315,14 +334,22 @@ namespace MbaCrm.Api.Controllers
         {
             var serviceRequest = await _context.ServiceRequests.FindAsync(id);
 
-            if (serviceRequest == null)
+            if (serviceRequest is null)
             {
-                return NotFound();
+                return ApiProblem(
+                    StatusCodes.Status404NotFound,
+                    "Kayıt bulunamadı.",
+                    "Güncellenmek istenen hizmet talebi bulunamadı."
+                );
             }
 
             if (!AllowedStatuses.Contains(dto.Status))
             {
-                return BadRequest("Geçersiz durum bilgisi.");
+                return ApiProblem(
+                    StatusCodes.Status400BadRequest,
+                    "Geçersiz istek.",
+                    "Geçersiz durum bilgisi."
+                );
             }
 
             serviceRequest.ServiceType = dto.ServiceType;
@@ -343,14 +370,22 @@ namespace MbaCrm.Api.Controllers
         {
             var serviceRequest = await _context.ServiceRequests.FindAsync(id);
 
-            if (serviceRequest == null)
+            if (serviceRequest is null)
             {
-                return NotFound();
+                return ApiProblem(
+                    StatusCodes.Status404NotFound,
+                    "Kayıt bulunamadı.",
+                    "Durumu güncellenmek istenen hizmet talebi bulunamadı."
+                );
             }
 
             if (!AllowedStatuses.Contains(dto.Status))
             {
-                return BadRequest("Geçersiz durum bilgisi.");
+                return ApiProblem(
+                    StatusCodes.Status400BadRequest,
+                    "Geçersiz istek.",
+                    "Geçersiz durum bilgisi."
+                );
             }
 
             serviceRequest.Status = dto.Status;
@@ -375,9 +410,13 @@ namespace MbaCrm.Api.Controllers
         {
             var serviceRequest = await _context.ServiceRequests.FindAsync(id);
 
-            if (serviceRequest == null)
+            if (serviceRequest is null)
             {
-                return NotFound();
+                return ApiProblem(
+                    StatusCodes.Status404NotFound,
+                    "Kayıt bulunamadı.",
+                    "Silinmek istenen hizmet talebi bulunamadı."
+                );
             }
 
             _context.ServiceRequests.Remove(serviceRequest);
