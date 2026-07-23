@@ -33,6 +33,13 @@ namespace MbaCrm.Api.Controllers
         } //Ben veritabanıyla çalışacağım, bana AppDbContext lazım.
 
         [HttpGet]
+        [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
+        [ProducesResponseType(
+    typeof(ProblemDetails),
+    StatusCodes.Status400BadRequest
+)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         public async Task<IActionResult> GetServiceRequests(
     [FromQuery] string? search,
     [FromQuery] string? status,
@@ -205,6 +212,13 @@ namespace MbaCrm.Api.Controllers
         }
 
         [HttpPost]
+        [ProducesResponseType(typeof(object), StatusCodes.Status201Created)]
+        [ProducesResponseType(
+    typeof(ProblemDetails),
+    StatusCodes.Status400BadRequest
+)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         public async Task<IActionResult> CreateServiceRequest(CreateServiceRequestDto dto)
         {
             var customer = await _context.Customers.FindAsync(dto.CustomerId);
@@ -249,6 +263,13 @@ namespace MbaCrm.Api.Controllers
         }
 
         [HttpGet("{id}")]
+        [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(
+    typeof(ProblemDetails),
+    StatusCodes.Status404NotFound
+)]
         public async Task<IActionResult> GetServiceRequestById(int id)
         {
             var serviceRequest = await _context.ServiceRequests
@@ -330,6 +351,17 @@ namespace MbaCrm.Api.Controllers
         }
 
         [HttpPut("{id}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(
+    typeof(ProblemDetails),
+    StatusCodes.Status400BadRequest
+)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(
+    typeof(ProblemDetails),
+    StatusCodes.Status404NotFound
+)]
         public async Task<IActionResult> UpdateServiceRequest(int id, UpdateServiceRequestDto dto)
         {
             var serviceRequest = await _context.ServiceRequests.FindAsync(id);
@@ -366,6 +398,17 @@ namespace MbaCrm.Api.Controllers
 
 
         [HttpPatch("{id}/status")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(
+    typeof(ProblemDetails),
+    StatusCodes.Status400BadRequest
+)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(
+    typeof(ProblemDetails),
+    StatusCodes.Status404NotFound
+)]
         public async Task<IActionResult> UpdateServiceRequestStatus(int id, UpdateServiceRequestStatusDto dto)
         {
             var serviceRequest = await _context.ServiceRequests.FindAsync(id);
@@ -406,6 +449,13 @@ namespace MbaCrm.Api.Controllers
 
         [HttpDelete("{id}")]
         [Authorize(Roles = AppRoles.Admin)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(
+    typeof(ProblemDetails),
+    StatusCodes.Status404NotFound
+)]
         public async Task<IActionResult> DeleteServiceRequest(int id)
         {
             var serviceRequest = await _context.ServiceRequests.FindAsync(id);

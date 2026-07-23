@@ -24,6 +24,13 @@ namespace MbaCrm.Api.Controllers
         }
 
         [HttpGet]
+        [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
+        [ProducesResponseType(
+    typeof(ProblemDetails),
+    StatusCodes.Status400BadRequest
+)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         public async Task<IActionResult> GetAll(
     [FromQuery] string? search,
     [FromQuery] string? customerType,
@@ -202,6 +209,13 @@ namespace MbaCrm.Api.Controllers
         }
 
         [HttpGet("{id}")]
+        [ProducesResponseType(typeof(Customer), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(
+    typeof(ProblemDetails),
+    StatusCodes.Status404NotFound
+)]
         public async Task<IActionResult> GetById(int id) //tek müşteriyi getirir.
         {
             var customer = await _context.Customers
@@ -221,6 +235,13 @@ namespace MbaCrm.Api.Controllers
         }
 
         [HttpPost]
+        [ProducesResponseType(typeof(Customer), StatusCodes.Status201Created)]
+        [ProducesResponseType(
+    typeof(ProblemDetails),
+    StatusCodes.Status400BadRequest
+)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         public async Task<IActionResult> Create(CreateCustomerDto dto) //API’ye gelen veri önce DTO’ya doluyor.
         {
             var customer = new Customer //Sonra biz kendimiz Customer entity’si oluşturuyoruz (mapping)
@@ -243,6 +264,17 @@ namespace MbaCrm.Api.Controllers
         }
 
         [HttpPut("{id}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(
+    typeof(ProblemDetails),
+    StatusCodes.Status400BadRequest
+)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(
+    typeof(ProblemDetails),
+    StatusCodes.Status404NotFound
+)]
         public async Task<IActionResult> Update(int id, UpdateCustomerDto dto) //buradaki 1, id parametresine gelir. / Swagger body’den gelen bilgiler de UpdateCustomerDto içine dolar.
         {
             var customer = await _context.Customers.FindAsync(id); //Veritabanında bu Id’ye sahip müşteriyi arar.
@@ -272,6 +304,13 @@ namespace MbaCrm.Api.Controllers
 
         [Authorize(Roles = AppRoles.Admin)]
         [HttpDelete("{id}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(
+    typeof(ProblemDetails),
+    StatusCodes.Status404NotFound
+)]
         public async Task<IActionResult> Delete(int id)
         {
             var customer = await _context.Customers.FindAsync(id); //Veritabanında ilgili müşteriyi arar.
@@ -292,6 +331,16 @@ namespace MbaCrm.Api.Controllers
         }
 
         [HttpGet("{customerId}/servicerequests")]
+        [ProducesResponseType(
+    typeof(List<object>),
+    StatusCodes.Status200OK
+)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(
+    typeof(ProblemDetails),
+    StatusCodes.Status404NotFound
+)]
         public async Task<IActionResult> GetServiceRequestsByCustomerId(int customerId)
         {
             var customerExists = await _context.Customers

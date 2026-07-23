@@ -25,6 +25,17 @@ namespace MbaCrm.Api.Controllers
         }
 
         [HttpPost]
+        [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
+        [ProducesResponseType(
+    typeof(ProblemDetails),
+    StatusCodes.Status400BadRequest
+)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(
+    typeof(ProblemDetails),
+    StatusCodes.Status404NotFound
+)]
         public async Task<IActionResult> CreateNote(
             int serviceRequestId,
             CreateServiceRequestNoteDto dto)
@@ -69,6 +80,16 @@ namespace MbaCrm.Api.Controllers
         }
 
         [HttpGet]
+        [ProducesResponseType(
+    typeof(List<object>),
+    StatusCodes.Status200OK
+)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(
+    typeof(ProblemDetails),
+    StatusCodes.Status404NotFound
+)]
         public async Task<IActionResult> GetNotesByServiceRequestId(int serviceRequestId)
         {
             var serviceRequestExists = await _context.ServiceRequests
@@ -100,6 +121,13 @@ namespace MbaCrm.Api.Controllers
 
         [HttpDelete("{noteId}")]
         [Authorize(Roles = AppRoles.Admin)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(
+    typeof(ProblemDetails),
+    StatusCodes.Status404NotFound
+)]
         public async Task<IActionResult> DeleteNote(int serviceRequestId, int noteId)
         {
             var note = await _context.ServiceRequestNotes

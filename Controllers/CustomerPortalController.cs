@@ -30,6 +30,16 @@ namespace MbaCrm.Api.Controllers
         }
 
         [HttpGet("me")]
+        [ProducesResponseType(
+    typeof(CustomerPortalProfileDto),
+    StatusCodes.Status200OK
+)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(
+    typeof(ProblemDetails),
+    StatusCodes.Status404NotFound
+)]
         public async Task<IActionResult> GetMyProfile()
         {
             var currentUser =
@@ -88,6 +98,12 @@ namespace MbaCrm.Api.Controllers
         }
 
         [HttpGet("service-requests")]
+        [ProducesResponseType(
+    typeof(List<CustomerPortalServiceRequestListDto>),
+    StatusCodes.Status200OK
+)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         public async Task<IActionResult> GetMyServiceRequests()
         {
             var currentUser =
@@ -141,6 +157,16 @@ namespace MbaCrm.Api.Controllers
         }
 
         [HttpGet("service-requests/{id:int}")]
+        [ProducesResponseType(
+    typeof(CustomerPortalServiceRequestDetailDto),
+    StatusCodes.Status200OK
+)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(
+    typeof(ProblemDetails),
+    StatusCodes.Status404NotFound
+)]
         public async Task<IActionResult> GetMyServiceRequestById(
     int id)
         {

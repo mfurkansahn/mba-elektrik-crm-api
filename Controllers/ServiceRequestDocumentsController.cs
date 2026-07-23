@@ -22,6 +22,17 @@ namespace MbaCrm.Api.Controllers
         }
 
         [HttpPost]
+        [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
+        [ProducesResponseType(
+    typeof(ProblemDetails),
+    StatusCodes.Status400BadRequest
+)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(
+    typeof(ProblemDetails),
+    StatusCodes.Status404NotFound
+)]
         public async Task<IActionResult> CreateDocument(int serviceRequestId, CreateServiceRequestDocumentDto dto)
         {
             var serviceRequestExists = await _context.ServiceRequests
@@ -74,6 +85,16 @@ namespace MbaCrm.Api.Controllers
         }
 
         [HttpGet]
+        [ProducesResponseType(
+    typeof(List<object>),
+    StatusCodes.Status200OK
+)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(
+    typeof(ProblemDetails),
+    StatusCodes.Status404NotFound
+)]
         public async Task<IActionResult> GetDocuments(int serviceRequestId)
         {
             var serviceRequestExists = await _context.ServiceRequests
@@ -107,6 +128,17 @@ namespace MbaCrm.Api.Controllers
         }
 
         [HttpPatch("{documentId:int}/delivery")]
+        [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
+        [ProducesResponseType(
+    typeof(ProblemDetails),
+    StatusCodes.Status400BadRequest
+)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(
+    typeof(ProblemDetails),
+    StatusCodes.Status404NotFound
+)]
         public async Task<IActionResult> UpdateDeliveryStatus(
             int serviceRequestId,
             int documentId,
@@ -155,6 +187,13 @@ namespace MbaCrm.Api.Controllers
 
         [HttpDelete("{documentId:int}")]
         [Authorize(Roles = AppRoles.Admin)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(
+    typeof(ProblemDetails),
+    StatusCodes.Status404NotFound
+)]
         public async Task<IActionResult> DeleteDocument(int serviceRequestId, int documentId)
         {
             var document = await _context.ServiceRequestDocuments

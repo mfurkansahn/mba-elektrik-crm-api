@@ -21,6 +21,9 @@ namespace MbaCrm.Api.Controllers
         }
 
         [HttpGet("summary")]
+        [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         public async Task<IActionResult> GetSummary()
         {
             var totalCustomers = await _context.Customers.CountAsync();
@@ -65,6 +68,9 @@ namespace MbaCrm.Api.Controllers
         }
 
         [HttpGet("reminders")]
+        [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         public async Task<IActionResult> GetReminders()
         {
             var turkeyTimeZone =
