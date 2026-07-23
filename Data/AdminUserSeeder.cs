@@ -12,22 +12,34 @@ namespace MbaCrm.Api.Data
             IConfiguration configuration)
         {
             var fullName =
-                configuration["AdminUser:FullName"]
-                ?? throw new InvalidOperationException(
+    configuration["AdminUser:FullName"]?.Trim();
+
+            if (string.IsNullOrWhiteSpace(fullName))
+            {
+                throw new InvalidOperationException(
                     "AdminUser:FullName yapılandırması bulunamadı."
                 );
+            }
 
             var email =
-                configuration["AdminUser:Email"]
-                ?? throw new InvalidOperationException(
+                configuration["AdminUser:Email"]?.Trim();
+
+            if (string.IsNullOrWhiteSpace(email))
+            {
+                throw new InvalidOperationException(
                     "AdminUser:Email yapılandırması bulunamadı."
                 );
+            }
 
             var password =
-                configuration["AdminUser:Password"]
-                ?? throw new InvalidOperationException(
+                configuration["AdminUser:Password"];
+
+            if (string.IsNullOrWhiteSpace(password))
+            {
+                throw new InvalidOperationException(
                     "AdminUser:Password yapılandırması bulunamadı."
                 );
+            }
 
             var adminUser =
                 await userManager.FindByEmailAsync(email);

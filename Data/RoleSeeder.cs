@@ -23,9 +23,21 @@ namespace MbaCrm.Api.Data
 
                 if (!roleExists)
                 {
-                    await roleManager.CreateAsync(
+                    var result = await roleManager.CreateAsync(
                         new IdentityRole(roleName)
                     );
+
+                    if (!result.Succeeded)
+                    {
+                        var errors = string.Join(
+                            ", ",
+                            result.Errors.Select(error => error.Description)
+                        );
+
+                        throw new InvalidOperationException(
+                            $"{roleName} rolü oluşturulamadı: {errors}"
+                        );
+                    }
                 }
             }
         }
