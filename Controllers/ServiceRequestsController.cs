@@ -15,18 +15,6 @@ namespace MbaCrm.Api.Controllers
     public class ServiceRequestsController : ApiControllerBase
     {
         private readonly AppDbContext _context; //Veritabanına ulaşmak için kullanacağımız alan.
-
-        private static readonly List<string> AllowedStatuses = new()
-        {
-            "Yeni Talep",
-            "Evrak Bekleniyor",
-            "Başvuru Hazırlanıyor",
-            "Enerjisa Başvurusu Yapıldı",
-            "Kontrol Bekleniyor",
-            "Tamamlandı",
-            "İptal Edildi"
-        };
-
         public ServiceRequestsController(AppDbContext context)
         {
             _context = context; //ASP.NET Core bize AppDbContext nesnesini otomatik veriyor.
@@ -232,6 +220,15 @@ namespace MbaCrm.Api.Controllers
                 );
             }
 
+            if (!ServiceRequestTypes.IsValid(dto.ServiceType))
+            {
+                return ApiProblem(
+                    StatusCodes.Status400BadRequest,
+                    "Geçersiz istek.",
+                    "Geçersiz hizmet türü bilgisi."
+                );
+            }
+
             var serviceRequest = new ServiceRequest
             {
                 CustomerId = dto.CustomerId,
@@ -239,7 +236,7 @@ namespace MbaCrm.Api.Controllers
                 Title = dto.Title,
                 Description = dto.Description,
                 DueDate = dto.DueDate,
-                Status = "Yeni Talep",
+                Status = ServiceRequestStatuses.NewRequest,
                 StartDate = DateTime.UtcNow,
                 CreatedAt = DateTime.UtcNow
             };
@@ -375,12 +372,21 @@ namespace MbaCrm.Api.Controllers
                 );
             }
 
-            if (!AllowedStatuses.Contains(dto.Status))
+            if (!ServiceRequestStatuses.IsValid(dto.Status))
             {
                 return ApiProblem(
                     StatusCodes.Status400BadRequest,
                     "Geçersiz istek.",
                     "Geçersiz durum bilgisi."
+                );
+            }
+
+            if (!ServiceRequestTypes.IsValid(dto.ServiceType))
+            {
+                return ApiProblem(
+                    StatusCodes.Status400BadRequest,
+                    "Geçersiz istek.",
+                    "Geçersiz hizmet türü bilgisi."
                 );
             }
 
@@ -422,7 +428,7 @@ namespace MbaCrm.Api.Controllers
                 );
             }
 
-            if (!AllowedStatuses.Contains(dto.Status))
+            if (!ServiceRequestStatuses.IsValid(dto.Status))
             {
                 return ApiProblem(
                     StatusCodes.Status400BadRequest,
@@ -433,7 +439,7 @@ namespace MbaCrm.Api.Controllers
 
             serviceRequest.Status = dto.Status;
 
-            if (dto.Status == "Tamamlandı")
+            if (dto.Status == ServiceRequestStatuses.Completed)
             {
                 serviceRequest.CompletedDate = DateTime.UtcNow;
             }
