@@ -26,6 +26,10 @@ namespace MbaCrm.Api.Data
         {
             base.OnModelCreating(modelBuilder);
 
+            modelBuilder.Entity<Customer>()
+    .Property(customer => customer.IsActive)
+    .HasDefaultValue(true);
+
             modelBuilder.Entity<ApplicationUser>()
                 .HasOne(user => user.Customer)
                 .WithOne()

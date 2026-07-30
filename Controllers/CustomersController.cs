@@ -38,6 +38,7 @@ namespace MbaCrm.Api.Controllers
     [FromQuery] string? district,
     [FromQuery] DateTime? createdFrom,
     [FromQuery] DateTime? createdTo,
+    [FromQuery] bool isActive = true,
     [FromQuery] string sortBy = "createdAt",
     [FromQuery] string sortDirection = "desc",
     [FromQuery] int pageNumber = 1,
@@ -73,8 +74,8 @@ namespace MbaCrm.Api.Controllers
             }
 
             var query = _context.Customers
-                .AsNoTracking()
-                .AsQueryable();
+    .AsNoTracking()
+    .Where(c => c.IsActive == isActive);
 
             if (!string.IsNullOrWhiteSpace(search))
             {
@@ -194,6 +195,7 @@ namespace MbaCrm.Api.Controllers
                     c.District,
                     c.CustomerType,
                     c.Description,
+                    c.IsActive,
                     c.CreatedAt
                 })
                 .ToListAsync();
@@ -325,23 +327,80 @@ namespace MbaCrm.Api.Controllers
     typeof(ProblemDetails),
     StatusCodes.Status404NotFound
 )]
-        public async Task<IActionResult> Delete(int id)
+        [ProducesResponseType(
+    typeof(ProblemDetails),
+    StatusCodes.Status409Conflict
+)]
+        public async Task<IActionResult> Deactivate(int id)
         {
-            var customer = await _context.Customers.FindAsync(id); //Veritabanında ilgili müşteriyi arar.
+            var customer = await _context.Customers.FindAsync(id);
 
             if (customer is null)
             {
                 return ApiProblem(
                     StatusCodes.Status404NotFound,
                     "Kayıt bulunamadı.",
-                    "Silinmek istenen müşteri bulunamadı."
+                    "Pasife alınmak istenen müşteri bulunamadı."
                 );
             }
 
-            _context.Customers.Remove(customer); //Bu müşteri silinmek üzere işaretlenir.
-            await _context.SaveChangesAsync(); //Silme işlemi gerçekten SQL Server’a uygulanır.
+            if (!customer.IsActive)
+            {
+                return ApiProblem(
+                    StatusCodes.Status409Conflict,
+                    "Müşteri zaten pasif.",
+                    "Belirtilen müşteri daha önce pasife alınmış."
+                );
+            }
 
-            return NoContent(); //Başarılı silme sonrası 204 No Content döner.
+            customer.IsActive = false;
+
+            await _context.SaveChangesAsync();
+
+            return NoContent();
+        }
+
+
+        [Authorize(Roles = AppRoles.Admin)]
+        [HttpPatch("{id}/activate")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(
+    typeof(ProblemDetails),
+    StatusCodes.Status404NotFound
+)]
+        [ProducesResponseType(
+    typeof(ProblemDetails),
+    StatusCodes.Status409Conflict
+)]
+        public async Task<IActionResult> Activate(int id)
+        {
+            var customer = await _context.Customers.FindAsync(id);
+
+            if (customer is null)
+            {
+                return ApiProblem(
+                    StatusCodes.Status404NotFound,
+                    "Kayıt bulunamadı.",
+                    "Aktif edilmek istenen müşteri bulunamadı."
+                );
+            }
+
+            if (customer.IsActive)
+            {
+                return ApiProblem(
+                    StatusCodes.Status409Conflict,
+                    "Müşteri zaten aktif.",
+                    "Belirtilen müşteri zaten aktif durumda."
+                );
+            }
+
+            customer.IsActive = true;
+
+            await _context.SaveChangesAsync();
+
+            return NoContent();
         }
 
         [HttpGet("{customerId}/servicerequests")]

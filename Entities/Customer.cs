@@ -30,6 +30,8 @@ namespace MbaCrm.Api.Entities
         [MaxLength(1000)]
         public string? Description { get; set; }
 
+        public bool IsActive { get; set; } = true;
+
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         public List<ServiceRequest> ServiceRequests { get; set; } = new();
