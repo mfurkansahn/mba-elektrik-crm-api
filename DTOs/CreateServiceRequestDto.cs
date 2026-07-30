@@ -40,6 +40,7 @@ namespace MbaCrm.Api.DTOs
         )]
         public string? Description { get; set; }
 
+        public DateTime? StartDate { get; set; }
 
         public DateTime? DueDate { get; set; }
 
@@ -52,6 +53,16 @@ namespace MbaCrm.Api.DTOs
             {
                 yield return new ValidationResult(
                     "Bitiş tarihi gelecekte olmalıdır.",
+                    new[] { nameof(DueDate) }
+                );
+            }
+
+            if (StartDate.HasValue &&
+    DueDate.HasValue &&
+    DueDate.Value <= StartDate.Value)
+            {
+                yield return new ValidationResult(
+                    "Bitiş tarihi başlangıç tarihinden sonra olmalıdır.",
                     new[] { nameof(DueDate) }
                 );
             }

@@ -237,7 +237,7 @@ namespace MbaCrm.Api.Controllers
                 Description = dto.Description,
                 DueDate = dto.DueDate,
                 Status = ServiceRequestStatuses.NewRequest,
-                StartDate = DateTime.UtcNow,
+                StartDate = dto.StartDate ?? DateTime.UtcNow,
                 CreatedAt = DateTime.UtcNow
             };
 
