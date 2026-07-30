@@ -28,6 +28,12 @@ namespace MbaCrm.Api.Controllers
         {
             var totalCustomers = await _context.Customers.CountAsync();
 
+            var activeCustomers = await _context.Customers
+                .CountAsync(x => x.IsActive);
+
+            var passiveCustomers = await _context.Customers
+                .CountAsync(x => !x.IsActive);
+
             var totalServiceRequests = await _context.ServiceRequests.CountAsync();
 
             var newRequests = await _context.ServiceRequests
@@ -54,6 +60,8 @@ namespace MbaCrm.Api.Controllers
             var result = new
             {
                 totalCustomers,
+                activeCustomers,
+                passiveCustomers,
                 totalServiceRequests,
                 newRequests,
                 waitingDocuments,
