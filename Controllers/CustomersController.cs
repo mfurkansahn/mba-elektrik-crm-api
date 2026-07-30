@@ -209,18 +209,32 @@ namespace MbaCrm.Api.Controllers
         }
 
         [HttpGet("{id}")]
-        [ProducesResponseType(typeof(Customer), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(
     typeof(ProblemDetails),
     StatusCodes.Status404NotFound
 )]
-        public async Task<IActionResult> GetById(int id) //tek müşteriyi getirir.
+        public async Task<IActionResult> GetById(int id)
         {
             var customer = await _context.Customers
-                .Include(c => c.ServiceRequests)
-                .FirstOrDefaultAsync(c => c.Id == id); //Id değeri verilen müşteriyi arar.
+                .AsNoTracking()
+                .Where(c => c.Id == id)
+                .Select(c => new
+                {
+                    c.Id,
+                    c.FullNameOrCompanyName,
+                    c.Phone,
+                    c.Email,
+                    c.Address,
+                    c.City,
+                    c.District,
+                    c.CustomerType,
+                    c.Description,
+                    c.CreatedAt
+                })
+                .FirstOrDefaultAsync();
 
             if (customer is null)
             {
