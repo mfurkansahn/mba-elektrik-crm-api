@@ -140,6 +140,68 @@ namespace MbaCrm.Api.Controllers
             return Ok(reminders);
         }
 
+        [HttpPut("{reminderId:int}")]
+        [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> UpdateReminder(
+    int serviceRequestId,
+    int reminderId,
+    UpdateServiceRequestReminderDto dto)
+        {
+            var reminder = await _context.ServiceRequestReminders
+                .FirstOrDefaultAsync(x =>
+                    x.Id == reminderId &&
+                    x.ServiceRequestId == serviceRequestId);
+
+            if (reminder is null)
+            {
+                return ApiProblem(
+                    StatusCodes.Status404NotFound,
+                    "Kayıt bulunamadı.",
+                    "Güncellenmek istenen hatırlatma bulunamadı."
+                );
+            }
+
+            if (string.IsNullOrWhiteSpace(dto.ReminderText))
+            {
+                return ApiProblem(
+                    StatusCodes.Status400BadRequest,
+                    "Geçersiz istek.",
+                    "Hatırlatma metni boş olamaz."
+                );
+            }
+
+            if (!reminder.IsCompleted && dto.ReminderDate <= DateTime.UtcNow)
+            {
+                return ApiProblem(
+                    StatusCodes.Status400BadRequest,
+                    "Geçersiz tarih bilgisi.",
+                    "Tamamlanmamış hatırlatmanın tarihi gelecekte olmalıdır."
+                );
+            }
+
+            reminder.ReminderText = dto.ReminderText.Trim();
+            reminder.ReminderDate = dto.ReminderDate;
+
+            await _context.SaveChangesAsync();
+
+            var response = new
+            {
+                reminder.Id,
+                reminder.ServiceRequestId,
+                reminder.ReminderText,
+                reminder.ReminderDate,
+                reminder.IsCompleted,
+                reminder.CompletedDate,
+                reminder.CreatedAt
+            };
+
+            return Ok(response);
+        }
+
         [HttpPatch("{reminderId:int}/completion")]
         [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
         [ProducesResponseType(

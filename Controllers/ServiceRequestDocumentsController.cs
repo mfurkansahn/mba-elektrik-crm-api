@@ -180,6 +180,59 @@ namespace MbaCrm.Api.Controllers
             return Ok(documents);
         }
 
+        [HttpPut("{documentId:int}")]
+        [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> UpdateDocument(
+    int serviceRequestId,
+    int documentId,
+    UpdateServiceRequestDocumentDto dto)
+        {
+            var document = await _context.ServiceRequestDocuments
+                .FirstOrDefaultAsync(x =>
+                    x.Id == documentId &&
+                    x.ServiceRequestId == serviceRequestId);
+
+            if (document is null)
+            {
+                return ApiProblem(
+                    StatusCodes.Status404NotFound,
+                    "Kayıt bulunamadı.",
+                    "Güncellenmek istenen evrak bulunamadı."
+                );
+            }
+
+            if (string.IsNullOrWhiteSpace(dto.DocumentName))
+            {
+                return ApiProblem(
+                    StatusCodes.Status400BadRequest,
+                    "Geçersiz istek.",
+                    "Evrak adı boş olamaz."
+                );
+            }
+
+            document.DocumentName = dto.DocumentName.Trim();
+            document.Description = string.IsNullOrWhiteSpace(dto.Description)
+                ? null
+                : dto.Description.Trim();
+
+            await _context.SaveChangesAsync();
+
+            return Ok(new
+            {
+                document.Id,
+                document.ServiceRequestId,
+                document.DocumentName,
+                document.Description,
+                document.IsDelivered,
+                document.DeliveredDate,
+                document.CreatedAt
+            });
+        }
+
         [HttpPatch("{documentId:int}/delivery")]
         [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
         [ProducesResponseType(
