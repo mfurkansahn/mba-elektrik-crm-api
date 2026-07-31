@@ -119,6 +119,59 @@ namespace MbaCrm.Api.Controllers
             return Ok(notes);
         }
 
+        [HttpPut("{noteId:int}")]
+        [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
+        [ProducesResponseType(
+    typeof(ProblemDetails),
+    StatusCodes.Status400BadRequest
+)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(
+    typeof(ProblemDetails),
+    StatusCodes.Status404NotFound
+)]
+        public async Task<IActionResult> UpdateNote(
+    int serviceRequestId,
+    int noteId,
+    UpdateServiceRequestNoteDto dto)
+        {
+            var note = await _context.ServiceRequestNotes
+                .FirstOrDefaultAsync(n =>
+                    n.Id == noteId &&
+                    n.ServiceRequestId == serviceRequestId);
+
+            if (note is null)
+            {
+                return ApiProblem(
+                    StatusCodes.Status404NotFound,
+                    "Kayıt bulunamadı.",
+                    "Güncellenmek istenen not bulunamadı."
+                );
+            }
+
+            if (string.IsNullOrWhiteSpace(dto.NoteText))
+            {
+                return ApiProblem(
+                    StatusCodes.Status400BadRequest,
+                    "Geçersiz istek.",
+                    "Not metni boş olamaz."
+                );
+            }
+
+            note.NoteText = dto.NoteText.Trim();
+
+            await _context.SaveChangesAsync();
+
+            return Ok(new
+            {
+                note.Id,
+                note.ServiceRequestId,
+                note.NoteText,
+                note.CreatedAt
+            });
+        }
+
         [HttpDelete("{noteId}")]
         [Authorize(Roles = AppRoles.Admin)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]

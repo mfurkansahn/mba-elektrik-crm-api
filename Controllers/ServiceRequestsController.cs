@@ -307,20 +307,25 @@ namespace MbaCrm.Api.Controllers
                         })
                         .ToList(),
 
-                                        Documents = sr.Documents
-                        .OrderBy(document => document.CreatedAt)
-                        .Select(document => new
-                        {
-                            document.Id,
-                            document.DocumentName,
-                            document.IsDelivered,
-                            document.DeliveredDate,
-                            document.Description,
-                            document.CreatedAt
-                        })
-                        .ToList(),
+                    Documents = sr.Documents
+    .OrderBy(document => document.CreatedAt)
+    .Select(document => new
+    {
+        document.Id,
+        document.DocumentName,
+        document.IsDelivered,
+        document.DeliveredDate,
+        document.Description,
+        document.CreatedAt,
+        document.OriginalFileName,
+        document.ContentType,
+        document.FileSize,
+        document.FileUploadedAt,
+        HasFile = document.StoredFileName != null
+    })
+    .ToList(),
 
-                                    Reminders = sr.Reminders
+                    Reminders = sr.Reminders
                         .OrderBy(reminder => reminder.ReminderDate)
                         .Select(reminder => new
                         {
