@@ -395,12 +395,25 @@ namespace MbaCrm.Api.Controllers
                 );
             }
 
+            var wasCompleted =
+    serviceRequest.Status == ServiceRequestStatuses.Completed;
+
             serviceRequest.ServiceType = dto.ServiceType;
             serviceRequest.Status = dto.Status;
             serviceRequest.Title = dto.Title;
             serviceRequest.Description = dto.Description;
+            serviceRequest.StartDate = dto.StartDate!.Value;
             serviceRequest.DueDate = dto.DueDate;
-            serviceRequest.CompletedDate = dto.CompletedDate;
+
+            if (!wasCompleted &&
+                dto.Status == ServiceRequestStatuses.Completed)
+            {
+                serviceRequest.CompletedDate = DateTime.UtcNow;
+            }
+            else if (dto.Status != ServiceRequestStatuses.Completed)
+            {
+                serviceRequest.CompletedDate = null;
+            }
 
             await _context.SaveChangesAsync();
 
@@ -442,13 +455,17 @@ namespace MbaCrm.Api.Controllers
                 );
             }
 
+            var wasCompleted =
+    serviceRequest.Status == ServiceRequestStatuses.Completed;
+
             serviceRequest.Status = dto.Status;
 
-            if (dto.Status == ServiceRequestStatuses.Completed)
+            if (!wasCompleted &&
+                dto.Status == ServiceRequestStatuses.Completed)
             {
                 serviceRequest.CompletedDate = DateTime.UtcNow;
             }
-            else
+            else if (dto.Status != ServiceRequestStatuses.Completed)
             {
                 serviceRequest.CompletedDate = null;
             }

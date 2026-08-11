@@ -43,39 +43,25 @@ namespace MbaCrm.Api.DTOs
         public string? Description { get; set; }
 
 
+        [Required(
+            ErrorMessage = "Başlangıç tarihi zorunludur."
+        )]
+        public DateTime? StartDate { get; set; }
+
+
         public DateTime? DueDate { get; set; }
-
-
-        public DateTime? CompletedDate { get; set; }
 
 
         public IEnumerable<ValidationResult> Validate(
             ValidationContext validationContext)
         {
-            if (CompletedDate.HasValue &&
-                CompletedDate.Value > DateTime.UtcNow)
+            if (StartDate.HasValue &&
+                DueDate.HasValue &&
+                DueDate.Value < StartDate.Value)
             {
                 yield return new ValidationResult(
-                    "Tamamlanma tarihi gelecekte olamaz.",
-                    new[] { nameof(CompletedDate) }
-                );
-            }
-
-            if (Status == "Tamamlandı" &&
-                !CompletedDate.HasValue)
-            {
-                yield return new ValidationResult(
-                    "Tamamlanan hizmet taleplerinde tamamlanma tarihi zorunludur.",
-                    new[] { nameof(CompletedDate) }
-                );
-            }
-
-            if (Status != "Tamamlandı" &&
-                CompletedDate.HasValue)
-            {
-                yield return new ValidationResult(
-                    "Tamamlanmamış hizmet taleplerinde tamamlanma tarihi boş olmalıdır.",
-                    new[] { nameof(CompletedDate) }
+                    "Bitiş tarihi başlangıç tarihinden önce olamaz.",
+                    new[] { nameof(DueDate) }
                 );
             }
         }
