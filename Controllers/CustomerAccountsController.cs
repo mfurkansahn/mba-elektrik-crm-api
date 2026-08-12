@@ -227,5 +227,61 @@ namespace MbaCrm.Api.Controllers
                 }
             );
         }
+        [HttpDelete("{userId}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(
+    typeof(ProblemDetails),
+    StatusCodes.Status400BadRequest
+)]
+        [ProducesResponseType(
+    typeof(ProblemDetails),
+    StatusCodes.Status404NotFound
+)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        public async Task<IActionResult> Delete(string userId)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+
+            if (user is null || !user.CustomerId.HasValue)
+            {
+                return ApiProblem(
+                    StatusCodes.Status404NotFound,
+                    "Kayıt bulunamadı.",
+                    "Belirtilen müşteri portal hesabı bulunamadı."
+                );
+            }
+
+            var customerId = user.CustomerId.Value;
+
+            var deleteResult = await _userManager.DeleteAsync(user);
+
+            if (!deleteResult.Succeeded)
+            {
+                var errors = deleteResult.Errors
+                    .Select(error => new
+                    {
+                        error.Code,
+                        error.Description
+                    })
+                    .ToList();
+
+                return ApiProblem(
+                    StatusCodes.Status400BadRequest,
+                    "Hesap silinemedi.",
+                    "Müşteri portal hesabı silinirken hatalar oluştu.",
+                    errors
+                );
+            }
+
+            _logger.LogInformation(
+                "Müşteri portal hesabı silindi. UserId: {UserId}, CustomerId: {CustomerId}, TraceId: {TraceId}",
+                userId,
+                customerId,
+                HttpContext.TraceIdentifier
+            );
+
+            return NoContent();
+        }
     }
 }
