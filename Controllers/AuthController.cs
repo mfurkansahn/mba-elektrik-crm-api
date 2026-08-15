@@ -165,13 +165,15 @@ namespace MbaCrm.Api.Controllers
             }
 
             var token = await _tokenService.CreateTokenAsync(user);
+            var roles = await _userManager.GetRolesAsync(user);
 
             var response = new AuthResponseDto
             {
                 Token = token,
                 UserId = user.Id,
                 FullName = user.FullName,
-                Email = user.Email ?? string.Empty
+                Email = user.Email ?? string.Empty,
+                Roles = roles
             };
 
             return Ok(response);
