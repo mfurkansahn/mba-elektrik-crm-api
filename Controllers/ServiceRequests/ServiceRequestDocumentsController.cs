@@ -264,9 +264,11 @@ namespace MbaCrm.Api.Controllers
                 );
             }
 
-            document.IsDelivered = dto.IsDelivered.Value;
+            var isDelivered = dto.IsDelivered!.Value;
 
-            if (dto.IsDelivered.Value)
+            document.IsDelivered = isDelivered;
+
+            if (isDelivered)
             {
                 document.DeliveredDate = DateTime.UtcNow;
             }

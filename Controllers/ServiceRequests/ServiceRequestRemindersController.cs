@@ -233,7 +233,7 @@ namespace MbaCrm.Api.Controllers
                 );
             }
 
-            var isCompleted = dto.IsCompleted.Value;
+            var isCompleted = dto.IsCompleted!.Value;
 
             reminder.IsCompleted = isCompleted;
 
