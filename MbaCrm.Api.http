@@ -1,6 +1,12 @@
-@MbaCrm.Api_HostAddress = http://localhost:5112
+@MbaCrm_Api_HostAddress = http://localhost:5112
+@AccessToken = PASTE_JWT_TOKEN_HERE
 
-GET {{MbaCrm.Api_HostAddress}}/weatherforecast/
+### Hizmet talebi türlerini getir
+GET {{MbaCrm_Api_HostAddress}}/api/ReferenceData/service-request-types
+Authorization: Bearer {{AccessToken}}
 Accept: application/json
 
-###
+### Hizmet talebi durumlarını getir
+GET {{MbaCrm_Api_HostAddress}}/api/ReferenceData/service-request-statuses
+Authorization: Bearer {{AccessToken}}
+Accept: application/json
