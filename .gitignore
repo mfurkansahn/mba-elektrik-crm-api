@@ -364,3 +364,11 @@ FodyWeavers.xsd
 
 # Uploaded customer documents
 Storage/
+
+# Local secrets and environment files
+.env
+.env.*
+!.env.example
+secrets.json
+appsettings.Local.json
+appsettings.*.Local.json
